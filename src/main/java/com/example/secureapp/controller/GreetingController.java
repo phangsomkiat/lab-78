@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 @Controller
 public class GreetingController {
@@ -27,6 +28,15 @@ public class GreetingController {
         String username = authentication.getName();
         model.addAttribute("username", username);
         return "greet";
+    }
+
+    @GetMapping("/")
+    public String rootRedirect() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/greet";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
